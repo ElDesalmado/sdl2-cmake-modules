@@ -42,16 +42,13 @@ This module defines the following 'IMPORTED' targets:
 
 ::
 
-  SDL2::Core (for compatibility with older versions)
-  SDL::SDL (compatibility with cmake-bundled FindSDL.cmake)
-  SDL2::SDL2 (compatibility with CONFIG mode)
+  SDL2::Core
     The SDL2 library, if found.
-    Libraries should link to SDL2::SDL2
+    Libraries should link to SDL2::Core
 
-  SDL2::Main (for compatibility with older versions)
-  SDL2::SDL2main (compatibility with CONFIG mode)
+  SDL2::Main
     The SDL2main library, if found.
-    Applications should link to SDL2::SDL2main instead of SDL2::SDL2
+    Applications should link to SDL2::Main instead of SDL2::Core
 
 
 
@@ -60,11 +57,8 @@ This module will set the following variables in your project:
 ::
 
   SDL2_LIBRARIES, the name of the library to link against
-  SDL_LIBRARIES (compatibility with cmake-bundled FindSDL.cmake)
   SDL2_INCLUDE_DIRS, where to find SDL.h
-  SDL_INCLUDE_DIRS (compatibility with cmake-bundled FindSDL.cmake)
   SDL2_FOUND, if false, do not try to link to SDL2
-  SDL_FOUND (compatibility with cmake-bundled FindSDL.cmake)
   SDL2MAIN_FOUND, if false, do not try to link to SDL2main
   SDL2_VERSION_STRING, human-readable string containing the version of SDL2
 
@@ -316,19 +310,16 @@ endif()
 
 include(FindPackageHandleStandardArgs)
 
-set(SDL2_REQUIRED_VARS SDL2_LIBRARY SDL2_INCLUDE_DIR)
-if(SDL2MAIN_LIBRARY)
-  list(APPEND SDL2_REQUIRED_VARS SDL2MAIN_LIBRARY SDL2_INCLUDE_DIR)
-endif()
-
-find_package_handle_standard_args(SDL2
-                                  REQUIRED_VARS ${SDL2_REQUIRED_VARS}
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(SDL2
+                                  REQUIRED_VARS SDL2_LIBRARY SDL2_INCLUDE_DIR
                                   VERSION_VAR SDL2_VERSION_STRING)
 
-# compatibility variables
-set(SDL_LIBRARIES ${SDL2_LIBRARIES})
-set(SDL_INCLUDE_DIRS ${SDL2_INCLUDE_DIRS})
-set(SDL_FOUND ${SDL2_FOUND})
+if(SDL2MAIN_LIBRARY)
+  FIND_PACKAGE_HANDLE_STANDARD_ARGS(SDL2main
+                                    REQUIRED_VARS SDL2MAIN_LIBRARY SDL2_INCLUDE_DIR
+                                    VERSION_VAR SDL2_VERSION_STRING)
+endif()
+
 
 mark_as_advanced(SDL2_PATH
                  SDL2_NO_DEFAULT_PATH
@@ -392,11 +383,6 @@ if(SDL2_FOUND)
       set_property(TARGET SDL2::Main APPEND PROPERTY
                    INTERFACE_LINK_LIBRARIES SDL2::MainInternal)
     endif()
-
-    # compatibility targets
-    add_library(SDL::SDL ALIAS SDL2::Core)
-    add_library(SDL2::SDL2 ALIAS SDL2::Core)
-    add_library(SDL2::SDL2main ALIAS SDL2::Main)
 
   endif()
 endif()
